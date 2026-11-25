@@ -15,15 +15,17 @@ export const FarmHeroSummary: React.FC<FarmHeroSummaryProps> = ({
   onOpenNewOrder,
   onOpenPreOrderModal,
 }) => {
+  // All pending dispatch orders (excluding delivered, cancelled, and pending payment)
   const pendingDispatchOrders = orders.filter(
     (o) => o.status !== 'delivered' && o.status !== 'cancelled' && o.status !== 'payment_pending'
   );
   const pendingOrders = orders.filter((o) => o.status === 'payment_pending');
 
   return (
+    /* Compact banner: 귤주문관리 옆에 주문안내문자, 주문접수 나란히 배치하여 슬림하고 깔끔하게 */
     <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#f7e2e2] text-slate-800 shadow-xs border border-[#ecd2d2]">
       <div className="relative z-10 px-3.5 py-2.5 sm:px-5 sm:py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 sm:gap-4">
-        {/* 귤주문관리 + 주문안내문자 + 주문접수 나란히 배치 */}
+        {/* Left: 귤주문관리 + 주문안내문자 + 주문접수 나란히 배치 */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="text-base select-none leading-none">🍊</span>
@@ -34,6 +36,7 @@ export const FarmHeroSummary: React.FC<FarmHeroSummaryProps> = ({
 
           <div className="h-3.5 w-px bg-[#ecd2d2] hidden sm:block" />
 
+          {/* Compact buttons: 주문안내문자 & 주문접수 */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"
@@ -56,7 +59,7 @@ export const FarmHeroSummary: React.FC<FarmHeroSummaryProps> = ({
           </div>
         </div>
 
-        {/* 발송 예정 & 입금 대기 */}
+        {/* Right: Quick KPI Chip (발송 예정 & 입금 대기) */}
         <div className="shrink-0 flex items-center gap-2.5 text-xs bg-white/90 border border-[#ecd2d2] px-3 py-1.5 rounded-lg shadow-2xs">
           <div className="flex items-center gap-1">
             <span className="text-[#5c7eb1] flex items-center gap-1 font-semibold">
