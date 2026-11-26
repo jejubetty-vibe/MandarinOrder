@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Search, Plus, Copy, Package } from 'lucide-react';
+import { Search, Plus, Copy, Package, FileSpreadsheet } from 'lucide-react';
 import { Order, OrderStatus, AppSettings } from '../types';
 import { OrderTable } from './OrderTable';
 import { copyToClipboard } from '../utils/clipboard';
 import { formatCourierRow, formatBulkCourierOrders } from '../utils/courier';
+import { exportCourierExcel } from '../utils/excelExport';
 import { getOrderSeasonKey, getAllSeasonKeys } from '../utils/season';
 import { useToast } from './Toast';
 
@@ -95,6 +96,24 @@ export const OrderList: React.FC<OrderListProps> = ({
     const ok = await copyToClipboard(fullText);
     if (ok) {
       showToast(`[주문접수] ${targetOrders.length}건의 택배정보가 발송내역별로 복사되었습니다!`, 'copy');
+    }
+  };
+
+  // Export Excel: Target courier-ready orders (or current filtered orders)
+  const handleExportExcel = () => {
+    const targetOrders = filteredOrders.filter(
+      (o) => o.status === 'order_received' || o.status === 'preparing' || o.status === 'in_transit'
+    );
+    const finalOrders = targetOrders.length > 0 ? targetOrders : filteredOrders;
+
+    if (finalOrders.length === 0) {
+      showToast('엑셀로 다운로드할 주문 내역이 없습니다.', 'info');
+      return;
+    }
+
+    const ok = exportCourierExcel(finalOrders, '택배접수목록');
+    if (ok) {
+      showToast(`택배 접수용 엑셀 파일(${finalOrders.length}건)이 다운로드되었습니다.`, 'success');
     }
   };
 
@@ -255,6 +274,17 @@ export const OrderList: React.FC<OrderListProps> = ({
               <span className="inline-flex items-center px-1.5 py-0.2 rounded-full bg-[#5c7eb1] text-[10px] font-medium text-white tracking-normal font-sans leading-none">
                 {receivedOrdersCount}건
               </span>
+            </button>
+
+            {/* Courier Excel Download Button */}
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+              title="이름, 전화번호, 배송지주소, 품목, 수량이 포함된 택배 접수용 엑셀(.xlsx) 파일을 다운로드합니다."
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+              <span>택배정보 엑셀다운</span>
             </button>
           </div>
         </div>
