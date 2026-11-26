@@ -9,6 +9,7 @@ import {
   Download,
   Upload,
   Cloud,
+  RotateCw,
 } from 'lucide-react';
 import { AppSettings, Order, Customer } from '../types';
 import { DEFAULT_SETTINGS } from '../data/initialData';
@@ -99,7 +100,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     reader.readAsText(file);
   };
 
-
+  const handleForceSync = async () => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of registrations) {
+          await reg.unregister();
+        }
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        for (const key of keys) {
+          await caches.delete(key);
+        }
+      }
+    } catch {
+      // ignore
+    }
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.location.href = `${cleanUrl}?sync=${Date.now()}`;
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
@@ -422,6 +442,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className="hidden"
                 />
               </label>
+            </div>
+
+            {/* Cache Buster & Mobile Sync */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleForceSync}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border border-sky-300 bg-sky-50 hover:bg-sky-100 text-[#1f3d59] transition-colors cursor-pointer"
+                title="모바일 기기에서 이전 화면이 계속 뜰 때 캐시를 비우고 최신 버전으로 강제 동기화합니다."
+              >
+                <RotateCw className="w-3.5 h-3.5 text-[#5c7eb1]" />
+                <span>스마트폰/PC 최신 버전 강제 동기화 (캐시 비우기 및 새로고침)</span>
+              </button>
+              <p className="text-[10px] text-slate-400 mt-1 text-center">
+                휴대폰에서 수정한 내용이 안 보일 때 누르면 최신 화면으로 즉시 갱신됩니다.
+              </p>
             </div>
           </div>
         </form>
