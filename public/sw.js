@@ -1,4 +1,4 @@
-// Minimal Service Worker to enable Chromium PWA install banner & standalone launcher
+// Service Worker for PWA installation & standalone home screen shortcut
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
@@ -7,6 +7,8 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', () => {
-  // Pass-through to network
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
 });
