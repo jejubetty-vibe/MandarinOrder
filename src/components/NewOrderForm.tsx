@@ -224,12 +224,6 @@ export const NewOrderForm: React.FC<NewOrderFormProps> = ({
     setPhone(formatted);
   };
 
-  // Quick Date Selectors
-  const setQuickDate = (offsetDays: number) => {
-    const d = new Date();
-    d.setDate(d.getDate() + offsetDays);
-    setDispatchDate(d.toISOString().slice(0, 10));
-  };
 
   // Quick match existing customers as user types name
   const matchingCustomers = customerName.trim().length >= 2
@@ -701,10 +695,18 @@ export const NewOrderForm: React.FC<NewOrderFormProps> = ({
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 최종 순수익
               </label>
-              <div className="text-base font-bold text-[#2d738d] font-mono">
-                +{netProfit.toLocaleString('ko-KR')}원
+              <div
+                className={`text-base font-bold font-mono ${
+                  netProfit < 0 ? 'text-rose-600' : 'text-[#2d738d]'
+                }`}
+              >
+                {netProfit > 0 ? '+' : ''}{netProfit.toLocaleString('ko-KR')}원
               </div>
-              <div className="text-[11px] text-[#2d738d] font-medium mt-1">
+              <div
+                className={`text-[11px] font-medium mt-1 ${
+                  netProfit < 0 ? 'text-rose-600' : 'text-[#2d738d]'
+                }`}
+              >
                 순수익률 {profitMargin}%
               </div>
             </div>
@@ -731,30 +733,6 @@ export const NewOrderForm: React.FC<NewOrderFormProps> = ({
                 onChange={(e) => setDispatchDate(e.target.value)}
                 className="w-full p-2 text-sm rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-[#62a4bc]/30 font-sans"
               />
-              <div className="flex items-center gap-1.5 mt-1.5">
-                <span className="text-[10px] text-slate-400">빠른 선택:</span>
-                <button
-                  type="button"
-                  onClick={() => setQuickDate(0)}
-                  className="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
-                >
-                  오늘 발송
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuickDate(1)}
-                  className="text-[11px] px-2 py-0.5 rounded bg-[#f7e2e2] hover:bg-[#eed7d7] text-[#1b1430] font-medium"
-                >
-                  내일 발송
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuickDate(2)}
-                  className="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
-                >
-                  모레 발송
-                </button>
-              </div>
             </div>
 
             {/* Order Status */}
@@ -797,9 +775,9 @@ export const NewOrderForm: React.FC<NewOrderFormProps> = ({
                 onChange={(e) => setCarrier(e.target.value)}
                 className="w-full p-2 text-sm rounded-xl border border-slate-200"
               >
+                <option value="CJ대한통운">CJ대한통운</option>
                 <option value="우체국택배">우체국택배</option>
                 <option value="농협택배">농협택배</option>
-                <option value="CJ대한통운">CJ대한통운</option>
                 <option value="한진택배">한진택배</option>
                 <option value="롯데택배">롯데택배</option>
                 <option value="로젠택배">로젠택배</option>
